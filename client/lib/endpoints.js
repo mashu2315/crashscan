@@ -5,7 +5,8 @@ export const endpoints = {
   SIGNUP: BASE_URL + "/auth/signup",
   LOGIN: BASE_URL + "/auth/login",
   VERIFY: BASE_URL + "/auth/verify-otp",
-  FORGOT_PASSWORD: BASE_URL + "/auth/forgotpassword",
+  FORGOT_PASSWORD: BASE_URL + "/auth/forgot-password",
+  LOGOUT: BASE_URL + "/auth/logout",
 }
 
 // PROFILE ENDPOINTS
@@ -22,6 +23,3 @@ export const inspectionEndpoints = {
   DELETE_RECORD: BASE_URL + "/inspection/",
   UPDATE_REMARKS: BASE_URL + "/inspection/",
 }
-
-
-

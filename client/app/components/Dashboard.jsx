@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Upload, X, Image as ImageIcon, Camera, Loader } from 'lucide-react';
+import { uploadInspectionService } from "@/services/inspectionServices";
 
 export default function Dashboard() {
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -65,72 +66,106 @@ export default function Dashboard() {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
 
-    if (!selectedFile) {
-      setError('Please select an image');
-      return;
-    }
+  //   if (!selectedFile) {
+  //     setError('Please select an image');
+  //     return;
+  //   }
 
-    setLoading(true);
-    setError('');
+  //   setLoading(true);
+  //   setError('');
 
-    try {
-      // Simulate AI analysis
-      await new Promise(resolve => setTimeout(resolve, 2000));
+  //   try {
+  //     // Simulate AI analysis
+  //     await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // Mock AI response
-      const mockResult = {
-        damage_type: 'Dent',
-        location: 'Front Left Door',
-        severity: 'Medium',
-        confidence: 0.91,
-        cosmetic: true,
-        repair_category: 'Minor Repair',
-        explanation: 'Detected dent on front left door with medium severity. Cosmetic damage affecting appearance.',
-      };
+  //     // Mock AI response
+  //     const mockResult = {
+  //       damage_type: 'Dent',
+  //       location: 'Front Left Door',
+  //       severity: 'Medium',
+  //       confidence: 0.91,
+  //       cosmetic: true,
+  //       repair_category: 'Minor Repair',
+  //       explanation: 'Detected dent on front left door with medium severity. Cosmetic damage affecting appearance.',
+  //     };
 
-      setResult(mockResult);
+  //     setResult(mockResult);
       
-      // Save to localStorage
-      const inspectionData = {
-        id: Date.now(),
-        image: previewUrl,
-        ...mockResult,
-        date: new Date().toLocaleDateString(),
-      };
+  //     // Save to localStorage
+  //     const inspectionData = {
+  //       id: Date.now(),
+  //       image: previewUrl,
+  //       ...mockResult,
+  //       date: new Date().toLocaleDateString(),
+  //     };
 
-      const inspections = JSON.parse(localStorage.getItem('inspections') || '[]');
-      inspections.unshift(inspectionData);
-      localStorage.setItem('inspections', JSON.stringify(inspections));
+  //     const inspections = JSON.parse(localStorage.getItem('inspections') || '[]');
+  //     inspections.unshift(inspectionData);
+  //     localStorage.setItem('inspections', JSON.stringify(inspections));
 
-      // Redirect to result page
-      setTimeout(() => {
-        router.push('/result');
-      }, 1000);
-    } catch (err) {
-      setError('Failed to analyze image. Please try again.');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     // Redirect to result page
+  //     setTimeout(() => {
+  //       router.push('/result');
+  //     }, 1000);
+  //   } catch (err) {
+  //     setError('Failed to analyze image. Please try again.');
+  //     console.error(err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   // Check authentication
-  const [isAuthorized, setIsAuthorized] = useState(null);
-  useState(() => {
-    const token = localStorage.getItem('jwt_token');
-    if (!token) {
-      router.push('/login');
-    } else {
-      setIsAuthorized(true);
-    }
-  }, [router]);
+  const handleSubmit = async (e) => {
+  e.preventDefault();
 
-  if (isAuthorized === false) {
-    return null;
+  if (!selectedFile) {
+    setError("Please select an image");
+    return;
   }
+
+  setLoading(true);
+  setError("");
+
+  try {
+    const formData = new FormData();
+    formData.append("image", selectedFile);
+
+    const res = await uploadInspectionService(formData);
+
+    if (!res.data.success) {
+      throw new Error("Upload failed");
+    }
+
+    setResult(res.data.data);
+
+    setTimeout(() => {
+      router.push("/result");
+    }, 1000);
+  } catch (err) {
+    console.error("UPLOAD ERROR:", err);
+    setError("Failed to analyze image. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+  // const [isAuthorized, setIsAuthorized] = useState(null);
+  // useState(() => {
+  //   const token = localStorage.getItem('jwt_token');
+  //   if (!token) {
+  //     router.push('/login');
+  //   } else {
+  //     setIsAuthorized(true);
+  //   }
+  // }, [router]);
+
+  // if (isAuthorized === false) {
+  //   return null;
+  // }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 px-4 py-12">

@@ -126,8 +126,22 @@ exports.login = async (req, res) => {
 
   res.json({
     success: true,
+    token,
     message: "Login successful",
   });
+};
+
+exports.logout = async (req, res) => {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: false,
+    });
+    return res.json({ success: true, message: "Logged out" });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: "Logout failed" });
+  }
 };
 
 // exports.forgotPassword = async (req, res) => {
@@ -154,4 +168,3 @@ exports.forgotPassword = async (req, res) => {
 
   res.json({ success: true, message: "Reset token sent to email" });
 };
-

@@ -14,21 +14,24 @@ exports.uploadInspection = async (req, res) => {
   });
 
   res.json({
-    summary: `${aiResult.damage_type} detected on ${aiResult.location}`,
-    repair_category: "bodywork",
-    ...aiResult,
-    record,
+    success: true,
+    data: {
+      summary: `${aiResult.damage_type} detected on ${aiResult.location}`,
+      repair_category: "bodywork",
+      ...aiResult,
+      record,
+    }
   });
 };
 
 exports.getHistory = async (req, res) => {
   const data = await Inspection.find({ userId: req.user.id });
-  res.json(data);
+  res.json({ success: true, data });
 };
 
 exports.deleteRecord = async (req, res) => {
   await Inspection.findByIdAndDelete(req.params.id);
-  res.json({ message: "Deleted" });
+  res.json({ success: true, message: "Deleted" });
 };
 
 exports.updateRemarks = async (req, res) => {
@@ -37,5 +40,5 @@ exports.updateRemarks = async (req, res) => {
     { remarks: req.body.remarks },
     { new: true }
   );
-  res.json(record);
+  res.json({ success: true, data: record });
 };
