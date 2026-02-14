@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Menu, X, LogOut, Home, BarChart3, History, User } from 'lucide-react';
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Menu, X, LogOut, Home, BarChart3, History, User } from "lucide-react";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,16 +11,18 @@ export default function Navbar() {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem('jwt_token');
-    setIsLoggedIn(!!token);
+    setIsLoggedIn(true); // cookie-based auth, backend will protect routes
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('jwt_token');
-    localStorage.removeItem('user_email');
-    setIsLoggedIn(false);
-    router.push('/');
-    setIsOpen(false);
+  const handleLogout = async () => {
+    try {
+      await logoutService(); // clears cookie on backend
+      setIsLoggedIn(false);
+      router.push("/");
+      setIsOpen(false);
+    } catch (err) {
+      console.log("LOGOUT ERROR:", err);
+    }
   };
 
   const handleNavClick = () => {
@@ -32,28 +34,45 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 font-bold text-xl hover:text-blue-400 transition">
-            <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">AI</div>
+          <Link
+            href="/"
+            className="flex items-center space-x-2 font-bold text-xl hover:text-blue-400 transition"
+          >
+            <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+              AI
+            </div>
             <span>VehicleDetect</span>
           </Link>
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-1">
-            <Link href="/" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700 transition flex items-center space-x-1">
+            <Link
+              href="/"
+              className="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700 transition flex items-center space-x-1"
+            >
               <Home size={18} />
               <span>Home</span>
             </Link>
             {isLoggedIn && (
               <>
-                <Link href="/dashboard" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700 transition flex items-center space-x-1">
+                <Link
+                  href="/dashboard"
+                  className="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700 transition flex items-center space-x-1"
+                >
                   <BarChart3 size={18} />
                   <span>Dashboard</span>
                 </Link>
-                <Link href="/history" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700 transition flex items-center space-x-1">
+                <Link
+                  href="/history"
+                  className="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700 transition flex items-center space-x-1"
+                >
                   <History size={18} />
                   <span>History</span>
                 </Link>
-                <Link href="/profile" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700 transition flex items-center space-x-1">
+                <Link
+                  href="/profile"
+                  className="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700 transition flex items-center space-x-1"
+                >
                   <User size={18} />
                   <span>Profile</span>
                 </Link>
@@ -73,10 +92,16 @@ export default function Navbar() {
               </button>
             ) : (
               <>
-                <Link href="/login" className="px-4 py-2 text-sm font-medium hover:bg-slate-700 rounded-md transition">
+                <Link
+                  href="/login"
+                  className="px-4 py-2 text-sm font-medium hover:bg-slate-700 rounded-md transition"
+                >
                   Login
                 </Link>
-                <Link href="/signup" className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-sm font-medium transition">
+                <Link
+                  href="/signup"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-sm font-medium transition"
+                >
                   Sign Up
                 </Link>
               </>
