@@ -1,10 +1,44 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
 import { CheckCircle, Zap, BarChart3, Shield, Camera, Brain, Clock, TrendingUp } from 'lucide-react';
 
 export default function LandingPage() {
   const router = useRouter();
+  const steps = [
+    {
+      step: 1,
+      title: "Upload Image",
+      desc: "Capture or upload a photo of the vehicle from your mobile device, camera, or gallery.",
+    },
+    {
+      step: 2,
+      title: "AI Analysis",
+      desc: "Our AI instantly processes the image to detect damage, location, and severity level.",
+    },
+    {
+      step: 3,
+      title: "Get Results",
+      desc: "Receive detailed damage report with visual overlays and confidence scores instantly.",
+    },
+    {
+      step: 4,
+      title: "Store & Analyze",
+      desc: "Save inspections and track damage patterns with analytics and historical data.",
+    },
+  ];
+
+  const [activeStep, setActiveStep] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveStep((prev) => (prev + 1) % steps.length);
+    }, 1500);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const handleUploadClick = () => {
     const token = localStorage.getItem('jwt_token');
@@ -19,13 +53,16 @@ export default function LandingPage() {
     <div className="w-full bg-white">
       {/* Hero Section */}
       <section className="relative px-4 sm:px-6 lg:px-8 py-20 sm:py-32 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-100 opacity-50"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-100 opacity-50" style={{
+    backgroundImage:
+      "url('https://images.unsplash.com/photo-1707779491283-4989f727825f?q=80&w=1312&auto=format&fit=crop')",
+  }}></div>
         <div className="relative max-w-7xl mx-auto">
           <div className="text-center">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 leading-tight text-balance">
               AI-Driven Vehicle Damage Detection &amp; Intelligent Assessment
             </h1>
-            <p className="text-xl text-slate-600 mb-8 max-w-2xl mx-auto text-balance">
+            <p className="text-xl text-black-600 mb-8 max-w-2xl mx-auto text-balance">
               Instantly identify vehicle damage, location, and severity with advanced AI technology. Accurate, fast, and reliable for insurance claims, dealer intake, and inspections.
             </p>
             <button
@@ -116,10 +153,10 @@ export default function LandingPage() {
               <Brain size={64} className="mb-4 opacity-80" />
               <h4 className="text-2xl font-bold mb-4">Advanced AI Model</h4>
               <p className="mb-4 opacity-90">
-                YOLOv8/CNN-based detection optimized for vehicle damage assessment across all weather and lighting conditions.
+                AI-powered damage detection using a modular vision pipeline. Designed to support YOLOv8/CNN-based models for vehicle damage assessment across diverse lighting and weather conditions.
               </p>
               <p className="text-sm opacity-75">
-                AI model placeholder — will be replaced by YOLOv8/CNN implementation
+                Current version uses a simulated AI inference module. Architecture is fully compatible with YOLOv8/CNN integration.
               </p>
             </div>
           </div>
@@ -127,57 +164,69 @@ export default function LandingPage() {
       </section>
 
       {/* How It Works Section */}
-      <section className="px-4 sm:px-6 lg:px-8 py-16 bg-slate-50">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-12 text-center">How It Works</h2>
-          <div className="grid md:grid-cols-4 gap-6">
-            <div className="relative">
-              <div className="bg-white rounded-lg p-8 shadow-md h-full">
-                <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mb-4">
-                  1
-                </div>
-                <h4 className="text-lg font-bold text-slate-900 mb-2">Upload Image</h4>
-                <p className="text-slate-600">
-                  Capture or upload a photo of the vehicle from your mobile device, camera, or gallery.
-                </p>
+    
+{/* How It Works Section */}
+<section className="px-4 sm:px-6 lg:px-8 py-20 bg-blue-50 overflow-hidden">
+  <div className="max-w-7xl mx-auto">
+    <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-12 text-center">
+      How It Works
+    </h2>
+
+    {/* Horizontal Timeline */}
+    <div className="relative">
+<div className="flex gap-6 overflow-x-auto overflow-y-hidden scrollbar-hide">
+        {steps.map((item, index) => {
+          const isActive = index === activeStep;
+
+          return (
+            <div
+  key={index}
+  className={`min-w-[260px] md:min-w-[300px]
+    bg-white rounded-xl p-6 shadow-md
+    transition-all duration-200 ease-out
+    overflow-hidden
+    ${
+      isActive
+        ? "opacity-100 translate-x-0 scale-105"
+        : "opacity-65 translate-x-4 scale-95"
+
+    }`}
+>
+
+              <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mb-4">
+                {item.step}
               </div>
+
+              <h4 className="text-lg font-bold text-slate-900 mb-2">
+                {item.title}
+              </h4>
+
+              <p className="text-slate-600 text-sm">
+                {item.desc}
+              </p>
             </div>
-            <div className="relative">
-              <div className="bg-white rounded-lg p-8 shadow-md h-full">
-                <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mb-4">
-                  2
-                </div>
-                <h4 className="text-lg font-bold text-slate-900 mb-2">AI Analysis</h4>
-                <p className="text-slate-600">
-                  Our AI instantly processes the image to detect damage, location, and severity level.
-                </p>
-              </div>
-            </div>
-            <div className="relative">
-              <div className="bg-white rounded-lg p-8 shadow-md h-full">
-                <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mb-4">
-                  3
-                </div>
-                <h4 className="text-lg font-bold text-slate-900 mb-2">Get Results</h4>
-                <p className="text-slate-600">
-                  Receive detailed damage report with visual overlays and confidence scores instantly.
-                </p>
-              </div>
-            </div>
-            <div className="relative">
-              <div className="bg-white rounded-lg p-8 shadow-md h-full">
-                <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mb-4">
-                  4
-                </div>
-                <h4 className="text-lg font-bold text-slate-900 mb-2">Store &amp; Analyze</h4>
-                <p className="text-slate-600">
-                  Save inspections and track damage patterns with analytics and historical data.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+          );
+        })}
+      </div>
+
+      {/* Progress Dots */}
+      <div className="flex justify-center gap-3 mt-8">
+        {steps.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setActiveStep(i)}
+            className={`w-3 h-3 rounded-full transition-all duration-200 ${
+              i === activeStep
+                ? "bg-blue-600 scale-125"
+                : "bg-blue-300"
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
 
       {/* Benefits Section */}
       <section className="px-4 sm:px-6 lg:px-8 py-16">

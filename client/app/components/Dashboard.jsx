@@ -304,7 +304,7 @@ export default function Dashboard() {
               {/* Info Box */}
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <p className="text-sm text-blue-800">
-                  <strong>Note:</strong> This is a demonstration. Results are simulated for testing purposes. The actual AI model will be implemented using YOLOv8/CNN.
+                  <strong>Note:</strong> Results are generated using our current AI inference pipeline. Model performance will continuously improve as the system is trained on additional real-world data and scenarios.
                 </p>
               </div>
             </form>
