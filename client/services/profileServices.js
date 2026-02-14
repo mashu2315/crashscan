@@ -80,46 +80,31 @@ import { apiConnector } from "@/lib/apiConnector"
 import { profileEndpoints } from "@/lib/endpoints"
 
 // GET PROFILE
-// export const getUserProfileService = (token) => {
-//   return apiConnector(
-//     "GET",
-//     profileEndpoints.GET_USER_DETAILS,
-//     null,
-//     {
-//       Authorization: `Bearer ${token}`,
-//     }
-//   )
-// }
 export const getUserProfileService = () => {
   return apiConnector(
     "GET",
     profileEndpoints.GET_USER_DETAILS,
     null,
-    {}, // No manual Authorization header needed
-    { withCredentials: true } // This tells the browser to send the hidden cookie
-  );
-};
+    {}
+  )
+}
 
 // UPDATE PROFILE
-export const updateUserProfileService = (token, data) => {
+export const updateUserProfileService = (data) => {
   return apiConnector(
     "PUT",
     profileEndpoints.UPDATE_USER_DETAILS,
     data,
-    {
-      Authorization: `Bearer ${token}`,
-    }
+    {}
   )
 }
 
 // DELETE PROFILE
-export const deleteUserProfileService = (token) => {
+export const deleteUserProfileService = () => {
   return apiConnector(
     "DELETE",
     profileEndpoints.DELETE_USER_PROFILE,
     null,
-    {
-      Authorization: `Bearer ${token}`,
-    }
+    {}
   )
 }

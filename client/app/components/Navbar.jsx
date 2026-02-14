@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Menu, X, LogOut, Home, BarChart3, History, User } from "lucide-react";
+import { logoutService } from "@/services/authServices";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);

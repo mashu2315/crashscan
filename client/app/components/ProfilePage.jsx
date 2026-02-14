@@ -266,13 +266,13 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Cookies from 'js-cookie';
 import { User, Mail, Edit2, Save, X, LogOut, Trash2, ShieldCheck, HelpCircle } from 'lucide-react';
 import { 
   getUserProfileService, 
   updateUserProfileService, 
   deleteUserProfileService 
 } from "@/services/profileServices";
+import { logoutService } from '@/services/authServices';
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState({
@@ -289,15 +289,9 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const token = Cookies.get('token');
-      if (!token) {
-        router.push('/login');
-        return;
-      }
-
       try {
         setLoading(true);
-        const response = await getUserProfileService(token);
+        const response = await getUserProfileService();
         
         if (response?.data?.success) {
           const userData = response.data.user || response.data.data;
@@ -328,7 +322,6 @@ export default function ProfilePage() {
   const handleSaveProfile = async () => {
     setError('');
     setSuccess('');
-    const token = Cookies.get('token');
 
     if (!editData.name || !editData.email) {
       setError('Name and email are required');
@@ -336,7 +329,7 @@ export default function ProfilePage() {
     }
 
     try {
-      const response = await updateUserProfileService(token, editData);
+      const response = await updateUserProfileService(editData);
       if (response?.data?.success) {
         setProfile((prev) => ({ ...prev, ...editData }));
         setIsEditing(false);
@@ -348,18 +341,22 @@ export default function ProfilePage() {
     }
   };
 
-  const handleLogout = () => {
-    Cookies.remove('token');
-    router.push('/login');
+  const handleLogout = async () => {
+    try {
+      await logoutService();
+      router.push('/login');
+    } catch (err) {
+      console.log('Logout error:', err);
+      router.push('/login');
+    }
   };
 
   const handleDeleteAccount = async () => {
     if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-      const token = Cookies.get('token');
       try {
-        const response = await deleteUserProfileService(token);
+        const response = await deleteUserProfileService();
         if (response?.data?.success) {
-          Cookies.remove('token');
+          await logoutService();
           router.push('/signup');
         }
       } catch (err) {
