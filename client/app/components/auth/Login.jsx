@@ -1,57 +1,58 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { Mail, Lock, EyeOff, Eye } from 'lucide-react';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Mail, Lock, EyeOff, Eye } from "lucide-react";
+import { loginService } from "@/services/authServices";
+import Cookies from "js-cookie";
 
 export default function Login() {
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const router = useRouter();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (!formData.email || !formData.password) {
-      setError('Email and password are required');
+      setError("Email and password are required");
       return;
     }
 
     setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
+      const res = await loginService(formData.email, formData.password);
 
-      const data = await response.json();
+      // ... inside your handleSubmit after res.data.success is true
+      if (res.data.success) {
+        const token = res.data.token;
 
-      if (response.ok) {
-        localStorage.setItem('jwt_token', data.token || 'mock_token_' + Date.now());
-        localStorage.setItem('user_email', formData.email);
-        router.push('/dashboard');
+        // This is the CRITICAL part.
+        // We save it as 'token' so it's visible to Cookies.get('token')
+        Cookies.set("token", token, { expires: 7 });
+
+        router.push("/dashboard");
       } else {
-        setError(data.message || 'Login failed');
+        setError(response?.data?.message || "Login failed");
       }
     } catch (err) {
-      setError('An error occurred. Please try again.');
+      setError("An error occurred. Please try again.");
       console.error(err);
     } finally {
       setLoading(false);
@@ -76,9 +77,14 @@ export default function Login() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email Field */}
             <div>
-              <label className="block text-sm font-medium text-slate-900 mb-2">Email Address</label>
+              <label className="block text-sm font-medium text-slate-900 mb-2">
+                Email Address
+              </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-3 text-slate-400" size={20} />
+                <Mail
+                  className="absolute left-3 top-3 text-slate-400"
+                  size={20}
+                />
                 <input
                   type="email"
                   name="email"
@@ -92,11 +98,16 @@ export default function Login() {
 
             {/* Password Field */}
             <div>
-              <label className="block text-sm font-medium text-slate-900 mb-2">Password</label>
+              <label className="block text-sm font-medium text-slate-900 mb-2">
+                Password
+              </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-3 text-slate-400" size={20} />
+                <Lock
+                  className="absolute left-3 top-3 text-slate-400"
+                  size={20}
+                />
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
@@ -115,7 +126,10 @@ export default function Login() {
 
             {/* Forgot Password Link */}
             <div className="text-right">
-              <Link href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-700">
+              <Link
+                href="/forgot-password"
+                className="text-sm text-blue-600 hover:text-blue-700"
+              >
                 Forgot password?
               </Link>
             </div>
@@ -126,14 +140,17 @@ export default function Login() {
               disabled={loading}
               className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Logging in...' : 'Login'}
+              {loading ? "Logging in..." : "Login"}
             </button>
           </form>
 
           {/* Signup Link */}
           <p className="text-center text-slate-600 mt-6">
-            Don't have an account?{' '}
-            <Link href="/signup" className="text-blue-600 hover:text-blue-700 font-semibold">
+            Don't have an account?{" "}
+            <Link
+              href="/signup"
+              className="text-blue-600 hover:text-blue-700 font-semibold"
+            >
               Sign Up
             </Link>
           </p>

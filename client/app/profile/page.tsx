@@ -1,5 +1,5 @@
 import Layout from '../components/Layout';
-import ProfilePage from '../components/ProfilePage';
+import ProfilePage from '../components/ProfilePage'
 
 export const metadata = {
   title: 'Profile - VehicleDetect',
