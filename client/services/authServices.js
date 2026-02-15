@@ -7,8 +7,10 @@ export const signupService = (data) => {
 }
 
 // VERIFY OTP
-export const verifyOtpService = (email, otp) => {
-  return apiConnector("POST", endpoints.VERIFY, { email, otp })
+export const verifyOtpService = (data) => {
+  return apiConnector("POST", endpoints.VERIFY,  {
+      email: data.email,
+      otp: data.otp} )
 }
 
 // LOGIN

@@ -4,17 +4,18 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Download, Share2, ArrowLeft, Edit2, Save, X } from 'lucide-react';
+import { useAuth } from "@/context/AuthContext";
 
 export default function ResultPage() {
   const [inspection, setInspection] = useState(null);
   const [remarks, setRemarks] = useState('');
   const [isEditingRemarks, setIsEditingRemarks] = useState(false);
   const router = useRouter();
+  const { isLoggedIn, loading: authLoading } = useAuth();
 
   useEffect(() => {
     // Check auth
-    const token = localStorage.getItem('jwt_token');
-    if (!token) {
+    if (!authLoading && !isLoggedIn) {
       router.push('/login');
       return;
     }
@@ -25,7 +26,7 @@ export default function ResultPage() {
       setInspection(inspections[0]);
       setRemarks(inspections[0].remarks || '');
     }
-  }, [router]);
+  }, [router, authLoading, isLoggedIn]);
 
   const handleSaveRemarks = () => {
     if (!inspection) return;
@@ -51,6 +52,18 @@ export default function ResultPage() {
         return 'bg-gray-100 text-gray-800 border-gray-300';
     }
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center px-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (!isLoggedIn) {
+    return null;
+  }
 
   if (!inspection) {
     return (

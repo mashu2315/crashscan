@@ -212,6 +212,7 @@ import {
   getInspectionHistoryService,
   deleteInspectionRecordService,
 } from "@/services/inspectionServices";
+import { useAuth } from "@/context/AuthContext";
 
 export default function HistoryPage() {
   const [inspections, setInspections] = useState([]);
@@ -220,6 +221,14 @@ export default function HistoryPage() {
   const [severityFilter, setSeverityFilter] = useState('all');
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const { isLoggedIn, loading: authLoading } = useAuth();
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!authLoading && !isLoggedIn) {
+      router.push('/login');
+    }
+  }, [isLoggedIn, authLoading, router]);
 
   // 🔹 FETCH HISTORY FROM BACKEND
   const fetchHistory = async () => {
@@ -241,8 +250,10 @@ export default function HistoryPage() {
   };
 
   useEffect(() => {
-    fetchHistory();
-  }, []);
+    if (!authLoading && isLoggedIn) {
+      fetchHistory();
+    }
+  }, [authLoading, isLoggedIn]);
 
   // 🔹 FILTER LOGIC (Restored from commented code)
   useEffect(() => {
@@ -301,11 +312,15 @@ export default function HistoryPage() {
     }
   };
 
-  if (loading) return (
+  if (authLoading || loading) return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
     </div>
   );
+
+  if (!isLoggedIn) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 px-4 py-12">

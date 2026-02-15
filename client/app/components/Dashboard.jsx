@@ -1,18 +1,36 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Upload, X, Image as ImageIcon, Camera, Loader } from 'lucide-react';
 import { uploadInspectionService } from "@/services/inspectionServices";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Dashboard() {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loadings, setLoadings] = useState(false);
   const [error, setError] = useState('');
   const [result, setResult] = useState(null);
   const fileInputRef = useRef(null);
   const router = useRouter();
+  const { isLoggedIn } = useAuth();
+
+console.log("first", isLoggedIn);
+  // Redirect if not authenticated
+useEffect(() => {
+  if (!isLoggedIn) {
+    router.replace("/login");
+  }
+}, [isLoggedIn, router]);
+
+
+
+ 
+
+  if (!isLoggedIn) {
+    return null;
+  }
 
   const handleFileSelect = (file) => {
     if (!file) return;
@@ -66,58 +84,6 @@ export default function Dashboard() {
     }
   };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-
-  //   if (!selectedFile) {
-  //     setError('Please select an image');
-  //     return;
-  //   }
-
-  //   setLoading(true);
-  //   setError('');
-
-  //   try {
-  //     // Simulate AI analysis
-  //     await new Promise(resolve => setTimeout(resolve, 2000));
-
-  //     // Mock AI response
-  //     const mockResult = {
-  //       damage_type: 'Dent',
-  //       location: 'Front Left Door',
-  //       severity: 'Medium',
-  //       confidence: 0.91,
-  //       cosmetic: true,
-  //       repair_category: 'Minor Repair',
-  //       explanation: 'Detected dent on front left door with medium severity. Cosmetic damage affecting appearance.',
-  //     };
-
-  //     setResult(mockResult);
-      
-  //     // Save to localStorage
-  //     const inspectionData = {
-  //       id: Date.now(),
-  //       image: previewUrl,
-  //       ...mockResult,
-  //       date: new Date().toLocaleDateString(),
-  //     };
-
-  //     const inspections = JSON.parse(localStorage.getItem('inspections') || '[]');
-  //     inspections.unshift(inspectionData);
-  //     localStorage.setItem('inspections', JSON.stringify(inspections));
-
-  //     // Redirect to result page
-  //     setTimeout(() => {
-  //       router.push('/result');
-  //     }, 1000);
-  //   } catch (err) {
-  //     setError('Failed to analyze image. Please try again.');
-  //     console.error(err);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   // Check authentication
   const handleSubmit = async (e) => {
   e.preventDefault();
@@ -127,7 +93,7 @@ export default function Dashboard() {
     return;
   }
 
-  setLoading(true);
+  setLoadings(true);
   setError("");
 
   try {
@@ -149,23 +115,10 @@ export default function Dashboard() {
     console.error("UPLOAD ERROR:", err);
     setError("Failed to analyze image. Please try again.");
   } finally {
-    setLoading(false);
+    setLoadings(false);
   }
 };
 
-  // const [isAuthorized, setIsAuthorized] = useState(null);
-  // useState(() => {
-  //   const token = localStorage.getItem('jwt_token');
-  //   if (!token) {
-  //     router.push('/login');
-  //   } else {
-  //     setIsAuthorized(true);
-  //   }
-  // }, [router]);
-
-  // if (isAuthorized === false) {
-  //   return null;
-  // }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 px-4 py-12">
@@ -319,10 +272,10 @@ export default function Dashboard() {
               {previewUrl && (
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={loadings}
                   className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                 >
-                  {loading ? (
+                  {loadings ? (
                     <>
                       <Loader className="animate-spin" size={20} />
                       <span>Analyzing Image...</span>

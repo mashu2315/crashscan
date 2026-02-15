@@ -1,28 +1,28 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Menu, X, LogOut, Home, BarChart3, History, User } from "lucide-react";
 import { logoutService } from "@/services/authServices";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isLoggedIn, logout } = useAuth();
   const router = useRouter();
-
-  useEffect(() => {
-    setIsLoggedIn(true); // cookie-based auth, backend will protect routes
-  }, []);
-
+console.log('out', isLoggedIn);
   const handleLogout = async () => {
     try {
       await logoutService(); // clears cookie on backend
-      setIsLoggedIn(false);
+      logout(); // updates context
       router.push("/");
       setIsOpen(false);
     } catch (err) {
       console.log("LOGOUT ERROR:", err);
+      // Still logout locally even if API fails
+      logout();
+      router.push("/");
     }
   };
 

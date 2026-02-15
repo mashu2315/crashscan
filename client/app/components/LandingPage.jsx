@@ -2,18 +2,19 @@
 
 import { useRouter } from 'next/navigation';
 import { CheckCircle, Zap, BarChart3, Shield, Camera, Brain, Clock, TrendingUp } from 'lucide-react';
-
+import { useAuth } from '@/context/AuthContext';
 export default function LandingPage() {
   const router = useRouter();
+  const { isLoggedIn } = useAuth();
 
   const handleUploadClick = () => {
-    const token = localStorage.getItem('jwt_token');
-    if (token) {
-      router.push('/dashboard');
-    } else {
-      router.push('/signup');
-    }
-  };
+  if (isLoggedIn) {
+    router.push("/dashboard");
+  } else {
+    router.push("/signup");
+  }
+};
+
 
   return (
     <div className="w-full bg-white">

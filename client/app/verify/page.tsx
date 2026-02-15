@@ -24,42 +24,38 @@ export default function VerifyOtp() {
   }, [router]);
 
   const handleVerify = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
+  e.preventDefault();
+  setError('');
 
-    if (otp.length < 4) {
-      setError('Please enter a valid OTP');
-      return;
+  if (otp.length < 4) {
+    setError('Please enter a valid OTP');
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const res = await verifyOtpService({
+      email: userData?.email?.email || userData?.email,
+      otp: otp,
+    });
+
+    if (res?.data && res.data.success) {
+      localStorage.removeItem('signupData'); // only temp data
+
+      // backend sets cookie — no localStorage token
+      router.push('/dashboard');
+    } else {
+      setError(res?.data?.message || 'Invalid OTP. Please try again.');
     }
+  } catch (err: any) {
+    setError(err.response?.data?.message || 'Verification failed.');
+    console.error("Verification Error:", err);
+  } finally {
+    setLoading(false);
+  }
+};
 
-    setLoading(true);
-
-    try {
-      // Step 1: Call verification service
-      // We send the email from localStorage and the OTP from the input
-      const res = await verifyOtpService({
-        email: userData?.email,
-        otp: otp,
-      });
-
-      if (res?.data && res.data.success) {
-        // Step 2: Clear temp signup data and save the real token
-        localStorage.removeItem('signupData');
-        localStorage.setItem('jwt_token', res.data.token);
-        localStorage.setItem('user_name', userData.name);
-
-        // Step 3: Redirect to dashboard
-        router.push('/dashboard');
-      } else {
-        setError(res?.data?.message || 'Invalid OTP. Please try again.');
-      }
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Verification failed. Please check your connection.');
-      console.error("Verification Error:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 px-4">

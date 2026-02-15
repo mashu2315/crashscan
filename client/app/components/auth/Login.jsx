@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Mail, Lock, EyeOff, Eye } from "lucide-react";
 import { loginService } from "@/services/authServices";
+import { useAuth } from "@/context/AuthContext";
 import Cookies from "js-cookie";
 
 export default function Login() {
@@ -16,6 +17,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const { login, isLoggedIn } = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -39,20 +41,22 @@ export default function Login() {
     try {
       const res = await loginService(formData.email, formData.password);
 
-      // ... inside your handleSubmit after res.data.success is true
       if (res.data.success) {
         const token = res.data.token;
+        const userData = res.data.user || { email: formData.email };
 
-        // This is the CRITICAL part.
-        // We save it as 'token' so it's visible to Cookies.get('token')
+        // Save token to cookies
         Cookies.set("token", token, { expires: 7 });
-
+        // Update auth context
+        login(userData);
+        console.log(userData);
+        console.log('Is', isLoggedIn)
         router.push("/dashboard");
       } else {
-        setError(response?.data?.message || "Login failed");
+        setError(res.data?.message || "Login failed");
       }
     } catch (err) {
-      setError("An error occurred. Please try again.");
+      setError(err.response?.data?.message || "An error occurred. Please try again.");
       console.error(err);
     } finally {
       setLoading(false);
